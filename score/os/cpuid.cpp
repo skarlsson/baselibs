@@ -20,6 +20,10 @@
 #include <arm_acle.h>
 #elif defined(__linux__) && defined(__x86_64__)
 #include <cpuid.h>
+#elif defined(__linux__) && defined(__aarch64__)
+#include "score/utility.hpp"
+#include <sys/auxv.h>
+#include <asm/hwcap.h>
 #else
 #error "Target platform not supported"
 #endif
@@ -68,6 +72,22 @@ class CpuIdImpl final : public CpuId
         /* KW_SUPPRESS_START:MISRA.USE.EXPANSION:OS library macros */
         __cpuid(leaf, eax, ebx, ecx, edx);
         /* KW_SUPPRESS_END:MISRA.USE.EXPANSION:OS library macros */
+
+#elif defined(__linux__) && defined(__aarch64__)
+        // On ARM64 Linux, we don't have a direct CPUID equivalent
+        // We can use auxiliary vector to get some CPU information
+        score::cpp::ignore = leaf;
+        
+        // Get CPU features from auxiliary vector
+        unsigned long hwcap = getauxval(AT_HWCAP);
+        unsigned long hwcap2 = getauxval(AT_HWCAP2);
+        
+        // Return hardware capabilities in the registers
+        // This is different from x86 CPUID but provides similar functionality
+        eax = static_cast<std::uint32_t>(hwcap & 0xFFFFFFFF);
+        ebx = static_cast<std::uint32_t>((hwcap >> 32) & 0xFFFFFFFF);
+        ecx = static_cast<std::uint32_t>(hwcap2 & 0xFFFFFFFF);
+        edx = static_cast<std::uint32_t>((hwcap2 >> 32) & 0xFFFFFFFF);
 #endif
     }
 };

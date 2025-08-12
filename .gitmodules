@@ -1,0 +1,4 @@
+[submodule "hack/toolchains_gcc"]
+	path = hack/toolchains_gcc
+	url = https://github.com/skarlsson/toolchains_gcc.git
+	branch = arm64-from-prebuilt

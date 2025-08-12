@@ -1,9 +1,10 @@
 cc_library(
     name = "libcap2",
-    srcs = [
-        "@libcap2-deb//:lib/x86_64-linux-gnu/libcap.so.2",
-        "@libcap2-deb//:lib/x86_64-linux-gnu/libcap.so.2.25",
-    ],
+    srcs = glob([
+        "usr/lib/*/libcap.a",
+        "usr/lib/libcap.a",
+        "usr/lib/*/libcap.so",
+    ]),
     hdrs = [
         "usr/include/sys/capability.h",
     ],
@@ -11,5 +12,6 @@ cc_library(
         "usr/include/",
         "usr/include/sys/",
     ],
-      visibility = ["//visibility:public"],
+    visibility = ["//visibility:public"],
+    alwayslink = True,
 )
